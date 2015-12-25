@@ -1,6 +1,7 @@
 #ifndef _GPBENCODE_H_
 #define _GPBENCODE_H_
 #include <string>
+#include <sstream>
 #include <vector>
 #include <map>
 
@@ -854,6 +855,50 @@ public:
 #undef MakeTag
 #undef output
 #undef field_number
+#undef INL
+
+class gpbtostr
+{
+public:
+    gpbtostr(){}
+    ~gpbtostr(){}
+
+public:
+    template<typename T>
+    static std::string tostr(const T &t) 
+    {   
+        std::ostringstream sBuffer;
+        sBuffer << t;
+        return sBuffer.str();
+    }
+    template<typename T>
+    static std::string tostr(const vector<T> &v) 
+    {
+        std::ostringstream sBuffer;
+        sBuffer<<"vector{("<<v.size()<<")";
+        for(vector<T>::const_iterator itr = v.begin(); itr != v.end(); ++itr)
+            sBuffer << *itr <<";";
+        sBuffer<<"}";
+        return sBuffer.str();
+    }
+    template<typename TK, typename TV>
+    static std::string tostr(const map<TK, TV> &m) 
+    {
+        std::ostringstream sBuffer;
+        sBuffer<<"map{("<<m.size()<<")";
+        for(map<TK, TV>::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+            sBuffer <<itr->first<<":"<<itr->second<<";";
+        sBuffer<<"}";
+        return sBuffer.str();
+    }
+
+    static std::string tostr(gpbmsg* msg) 
+    {   
+        if(msg == NULL)
+            return string("");
+        return msg->tostr();
+    }
+};
 
 }
 #endif//_GPBENCODE_H_

@@ -87,6 +87,7 @@ bool genclass(const Descriptor* message, map<string, string>& msgdifines)
 	mapmsgs.insert(make_pair(msg_name, message));
 	if(message->options().map_entry())
 		return true;
+	string tostr="\tstring tostr(){\n\t\tstring out=\""+msg_name+"={\";\n";
 	classes = "class "+msg_name+":public gpb::gpbmsg{\npublic:\n\t"+msg_name+"(){}\n\t~"+msg_name+"(){}\n";
 	functions = "\npublic:\n";
 	members = "\nprivate:\n";
@@ -99,6 +100,7 @@ bool genclass(const Descriptor* message, map<string, string>& msgdifines)
 		string memname = "m_"+field->name();
 		members+="\t"+stype+" "+memname+";\n";
 
+		tostr += "\t\tout += \""+memname+":[\";\n";
 		ostringstream sBuffer;
 		sBuffer << field->number();
 		if(field->is_map()){
@@ -125,7 +127,14 @@ bool genclass(const Descriptor* message, map<string, string>& msgdifines)
 				"\t\t\t\tif(!gpb::gpbdecoder::ReadPrimitive(&input, &valtag)) return false;\n"+
 				"\t\t\t\t"+val+" val;\n"+
 				"\t\t\t\tif(!gpb::gpbdecoder::ReadPrimitive(&input, &val)) return false;\n"+
-				"\t\t\t\t"+memname+".insert(make_pair(key, val));break;\n\t\t\t}\n";
+				"\t\t\t\t"+memname+".insert(std::make_pair(key, val));break;\n\t\t\t}\n";
+
+			if (mes->field(1)->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE){
+				tostr += "\t\tfor("+stype+"::iterator it = "+memname+".begin(); it != "+memname+".end(); ++it){\n\t"+
+					"\t\tout += gpb::gpbtostr::tostr(it->first)+\":\"+gpb::gpbtostr::tostr((gpbmsg*)&(it->seconde));\n\t\t}\n";
+			}
+			else
+				tostr += "\t\tout += gpb::gpbtostr::tostr("+memname+");\n";
 			
 		}else if(field->is_repeated()){
 			if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE){
@@ -150,12 +159,24 @@ bool genclass(const Descriptor* message, map<string, string>& msgdifines)
 			}
 			else
 				decode += "\t\t\tcase "+sBuffer.str()+":{\n\t\t\t\tif(!gpb::gpbdecoder::ReadRepeatedPrimitive(&input, "+memname+")) return false;break;\n\t\t\t}\n";
+
+			if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE){
+				tostr += "\t\tfor(int i = 0; i < (int)"+memname+".size(); ++i){\n\t"+
+					"\t\tout += gpb::gpbtostr::tostr((gpbmsg*)&"+memname+"[i]);\n\t\t}\n";
+			}
+			else
+				tostr += "\t\tout += gpb::gpbtostr::tostr("+memname+");\n";
 		}else{
 			encode += "\t\tbuf = gpb::gpbencoder::WriteDataToArray("+sBuffer.str()+", "+memname+", buf);\n";
 			decode += "\t\t\tcase "+sBuffer.str()+":{\n\t\t\t\tif(!gpb::gpbdecoder::ReadPrimitive(&input, &"+memname+")) return false;break;\n\t\t\t}\n";
+			if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE){
+				tostr += "\t\tout += gpb::gpbtostr::tostr((gpbmsg*)&"+memname+");\n";
+			}
+			else tostr += "\t\tout += gpb::gpbtostr::tostr("+memname+");\n";
 		}
+		tostr += "\t\tout += \"]\";\n";
 		
-		if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE){
+		if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE || field->is_repeated() || field->is_map()){
 			stype += "&";
 		}
 		functions+="\t"+stype+" get"+field->name()+"(){return "+memname+";}\n";
@@ -163,7 +184,8 @@ bool genclass(const Descriptor* message, map<string, string>& msgdifines)
 	}
 	encode+="\t\treturn buf - buffer;\n\t}\n";
 	decode+="\t\t\tdefault: return false;\n\t\t\t}\n\t\t}\n\t}\n";
-	msgdifines.insert(std::make_pair(msg_name, classes+encode+decode+functions+members+"};\n\n"));
+	tostr+="\t\treturn out+\"}\";\n\t}\n";
+	msgdifines.insert(std::make_pair(msg_name, classes+encode+decode+tostr+functions+members+"};\n\n"));
 	return true;
 }
 
