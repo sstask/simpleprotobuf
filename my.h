@@ -32,6 +32,13 @@ public:
 			}
 		}
 	}
+	string tostr(){
+		string out="mymsg1_my={";
+		out += "m_len:[";
+		out += gpb::gpbtostr::tostr(m_len);
+		out += "]";
+		return out+"}";
+	}
 
 public:
 	gpb::uint32 getlen(){return m_len;}
@@ -84,12 +91,30 @@ public:
 			}
 		}
 	}
+	string tostr(){
+		string out="mymsg1={";
+		out += "m_len:[";
+		out += gpb::gpbtostr::tostr(m_len);
+		out += "]";
+		out += "m_typ:[";
+		out += gpb::gpbtostr::tostr(m_typ);
+		out += "]";
+		out += "m_msg:[";
+		for(int i = 0; i < (int)m_msg.size(); ++i){
+			out += gpb::gpbtostr::tostr((gpbmsg*)&m_msg[i]);
+		}
+		out += "]";
+		out += "m_mes:[";
+		out += gpb::gpbtostr::tostr((gpbmsg*)&m_mes);
+		out += "]";
+		return out+"}";
+	}
 
 public:
 	gpb::uint32 getlen(){return m_len;}
 	void setlen(gpb::uint32 len){m_len=len;}
-	vector<string> gettyp(){return m_typ;}
-	void settyp(vector<string> typ){m_typ=typ;}
+	vector<string>& gettyp(){return m_typ;}
+	void settyp(vector<string>& typ){m_typ=typ;}
 	vector<mymsg1_my>& getmsg(){return m_msg;}
 	void setmsg(vector<mymsg1_my>& msg){m_msg=msg;}
 	mymsg1_my& getmes(){return m_mes;}
@@ -131,12 +156,22 @@ public:
 			}
 		}
 	}
+	string tostr(){
+		string out="mymsg={";
+		out += "m_len:[";
+		out += gpb::gpbtostr::tostr(m_len);
+		out += "]";
+		out += "m_typ:[";
+		out += gpb::gpbtostr::tostr(m_typ);
+		out += "]";
+		return out+"}";
+	}
 
 public:
 	gpb::uint32 getlen(){return m_len;}
 	void setlen(gpb::uint32 len){m_len=len;}
-	vector<gpb::uint32> gettyp(){return m_typ;}
-	void settyp(vector<gpb::uint32> typ){m_typ=typ;}
+	vector<gpb::uint32>& gettyp(){return m_typ;}
+	void settyp(vector<gpb::uint32>& typ){m_typ=typ;}
 
 private:
 	gpb::uint32 m_len;
@@ -180,11 +215,24 @@ public:
 				if(!gpb::gpbdecoder::ReadPrimitive(&input, &valtag)) return false;
 				string val;
 				if(!gpb::gpbdecoder::ReadPrimitive(&input, &val)) return false;
-				m_str.insert(make_pair(key, val));break;
+				m_str.insert(std::make_pair(key, val));break;
 			}
 			default: return false;
 			}
 		}
+	}
+	string tostr(){
+		string out="mymsg2={";
+		out += "m_len:[";
+		out += gpb::gpbtostr::tostr(m_len);
+		out += "]";
+		out += "m_typ:[";
+		out += gpb::gpbtostr::tostr(m_typ);
+		out += "]";
+		out += "m_str:[";
+		out += gpb::gpbtostr::tostr(m_str);
+		out += "]";
+		return out+"}";
 	}
 
 public:
@@ -225,6 +273,13 @@ public:
 			default: return false;
 			}
 		}
+	}
+	string tostr(){
+		string out="mymsg3={";
+		out += "m_tt:[";
+		out += gpb::gpbtostr::tostr((gpbmsg*)&m_tt);
+		out += "]";
+		return out+"}";
 	}
 
 public:
