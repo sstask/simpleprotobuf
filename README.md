@@ -1,5 +1,7 @@
 # simpleprotobuf
-a simple data encoder support for Google's protocol buffers
+a simple data encoder support for Google's protocol buffers.
+it's a new lib which can run without google protobuf.
+importantly, it can encode or decode the datas from google protobuf.
 
 **gpbencode.h** 
 >类gpbdecoder和gpbencoder分别实现了数据的解码与编码，编码方式完全按照Google's protocol buffers源码实现，所以完全兼容现有的Google's protocol buffers版本。
