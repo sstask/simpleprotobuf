@@ -11,4 +11,4 @@ importantly, it can encode or decode the datas from google protobuf.
 **gpbgenerator.h**
 >类gpbgenerator的作用是把.proto文件编译成c++文件，该生成的c++文件依赖于上面的gpbdecoder和gpbencoder，从而脱离了对google protobuf的依赖。该类同样也不依赖于google protobuf库。
 
-sampley.h中my.proto aa.proto是生成的示例。
+sample中my.proto aa.proto my.h aa.h是生成的示例。
