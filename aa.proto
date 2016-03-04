@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-message test {
-  int32 a = 1;
-  repeated string b = 2;
-  map<int32, int32> d = 4;
-}
-
