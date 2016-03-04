@@ -1,0 +1,40 @@
+syntax = "proto3";
+import "aa.proto";
+
+enum ActivityShowType
+{
+    ActivityShowType_MainCity       =   1;          // 主城
+    ActivityShowType_ActList        =   2;          // 活动列表
+};
+
+message mymsg1
+{
+	message my
+	{
+		message mymy
+		{
+			uint32 len = 1;
+		}
+		uint32 len = 1;
+		mymy temp = 2;
+	}
+	uint32 len = 1;
+	repeated string typ = 2;
+	repeated my msg=3;
+	my mes=4;
+}
+
+message mymsg2
+{
+	uint32 len = 1;
+	uint32 typ = 2;
+	map<uint32,string> str = 3;
+}
+
+message mymsg3
+{
+	test tt = 1;
+}
+
+
+
